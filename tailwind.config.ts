@@ -9,6 +9,20 @@ export default {
   ],
   theme: {
   	extend: {
+		typography: {
+			DEFAULT: {
+			css: {
+				maxWidth: 'none',
+				color: '#333',
+					a: {
+						color: '#3182ce',
+						'&:hover': {
+							color: '#2c5282',
+						},
+					},
+				},
+			},
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

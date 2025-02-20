@@ -1,20 +1,37 @@
+
 import BlogList from '@/components/Blog/BlogList';
+import { Suspense } from 'react';
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function getBlogs() {
-  const res = await fetch('http://localhost:3000/api/blogs', { cache: 'no-store' });
-  if (!res.ok) {
-    throw new Error('Failed to fetch blogs');
+  try {
+    // Add 5 second delay
+    await delay(5000);
+    
+    const res = await fetch('http://localhost:3000/api/blogs', { 
+      cache: 'no-store' 
+    });
+    
+    if (!res.ok) {
+      throw new Error('Failed to fetch blogs');
+    }
+    
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+    throw error;
   }
-  return res.json();
 }
 
 export default async function BlogPage() {
   const blogs = await getBlogs();
   
   return (
-    <main>
-      <BlogList blogs={blogs} />
+    <main className="min-h-screen bg-background">
+      <Suspense fallback={<BlogList blogs={[]} isLoading={true} />}>
+        <BlogList blogs={blogs} isLoading={false} />
+      </Suspense>
     </main>
   );
 }
-

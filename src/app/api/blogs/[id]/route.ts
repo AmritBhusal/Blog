@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    const response = await fetch('https://dev.to/api/articles', {
-      signal: AbortSignal.timeout(5000) 
+    const response = await fetch(`https://dev.to/api/articles/${params.id}`, {
+      signal: AbortSignal.timeout(5000)
     });
 
     if (!response.ok) {
@@ -11,11 +14,6 @@ export async function GET() {
     }
 
     const data = await response.json();
-    
-    if (!Array.isArray(data)) {
-      throw new Error('Invalid data format received');
-    }
-
     return NextResponse.json(data);
 
   } catch (error) {
@@ -33,17 +31,8 @@ export async function GET() {
       );
     }
 
-    if (error instanceof Error) {
-      console.error('API Error:', error.message);
-      
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
-    }
-
     return NextResponse.json(
-      { error: 'An unexpected error occurred' },
+      { error: 'Failed to fetch blog details' },
       { status: 500 }
     );
   }

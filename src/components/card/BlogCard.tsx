@@ -4,13 +4,15 @@ import React from 'react';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import type { Blog } from '@/types/blog';
+import { useRouter } from 'next/navigation';
 
 interface BlogCardProps {
   blog: Blog;
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
-  const defaultImage = '/api/placeholder/400/300'; // Placeholder image URL
+  const router = useRouter();
+  const defaultImage = '/api/placeholder/400/300'; 
 
   return (
     <Card className="hover:shadow-lg transition-shadow">
@@ -54,7 +56,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
           <div className="flex justify-between items-center mt-auto">
             <button 
               className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
-              onClick={() => window.open(blog.url, '_blank')}
+              onClick={() => router.push(`/blogs/${blog.id}`)}
             >
               Read more
               <span className="text-lg">→</span>
