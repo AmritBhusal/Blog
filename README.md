@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js Blog Project
+
+A modern blog application built with Next.js 15, React 19, TypeScript, and Tailwind CSS.
+
+## Features
+
+- 🎨 Modern UI components built with Radix UI
+- 🌗 Dark mode support using next-themes
+- 📱 Responsive design
+- 🎯 Type-safe development with TypeScript
+- 🎨 Styled with Tailwind CSS
+- 📅 Date handling with date-fns
+- 🔍 Advanced filtering and search capabilities
+- 📄 Blog post pagination
+
+## Prerequisites
+
+Before you begin, ensure you have installed:
+- Node.js (latest LTS version recommended)
+- npm package manager
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── blogs/             # Blog-related components and logic
+│   ├── components/        # Reusable UI components
+│   │   ├── card/         # Card-related components
+│   │   ├── ui/           # Base UI components
+│   │   └── hooks/        # Custom React hooks
+│   └── types/            # TypeScript type definitions
+├── public/               # Static assets
+```
 
 ## Getting Started
 
-First, run the development server:
-
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd blog
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Run the development server:
+```bash
+npm run dev
+```
 
-## Learn More
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-To learn more about Next.js, take a look at the following resources:
+## Available Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev` - Starts the development server
+- `npm run build` - Creates a production build
+- `npm run start` - Runs the production server
+- `npm run lint` - Runs ESLint for code linting
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Dependencies
 
-## Deploy on Vercel
+### Core
+- Next.js 15.1.7
+- React 19.0.0
+- TypeScript 5.x
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### UI Components
+- Radix UI components
+- Tailwind CSS
+- Lucide React (for icons)
+- class-variance-authority
+- clsx
+- tailwind-merge
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Utilities
+- date-fns
+- js-cookie
+- next-themes
+
+## Development Dependencies
+
+- ESLint with Next.js configuration
+- TypeScript
+- Tailwind CSS
+- PostCSS
+- Various type definitions (@types/*)
+
+## Styling
+
+This project uses Tailwind CSS for styling with additional features:
+- @tailwindcss/typography for rich text styling
+- tailwindcss-animate for animations
+- Custom UI components built with Radix UI primitives
+
+## Project Configuration
+
+Key configuration files:
+- `next.config.js` - Next.js configuration
+- `tailwind.config.js` - Tailwind CSS configuration
+- `tsconfig.json` - TypeScript configuration
+- `eslint.config.js` - ESLint configuration
