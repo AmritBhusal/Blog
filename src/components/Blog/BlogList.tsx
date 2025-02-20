@@ -1,13 +1,16 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { subDays } from 'date-fns';
+import Cookies from 'js-cookie';
 import type { Blog } from '@/types/blog';
-import SearchBar from './SearchBar';
-import DateFilter from './DateFilter';
 import BlogCard from '../card/BlogCard';
 import BlogPagination from '../Pagination';
-import BlogSkeleton from './BlogSkeleton';
+import BlogSkeleton from '../../app/loading';
+import SearchBar from './SearchBar';
 import { Skeleton } from "@/components/ui/skeleton";
+import ActiveFilters from './ActiveFilters';
+import FilterBar from './FilterBar';
 
 interface BlogListProps {
   blogs: Blog[];
@@ -20,6 +23,12 @@ const BlogList: React.FC<BlogListProps> = ({ blogs, isLoading = false }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
+  const [showLikedOnly, setShowLikedOnly] = useState(false);
+
+  const getLikedBlogs = () => {
+    const likedBlogs = Cookies.get('likedBlogs');
+    return likedBlogs ? JSON.parse(likedBlogs) : [];
+  };
 
   const filteredBlogs = useMemo(() => {
     let filtered = [...blogs];
@@ -31,50 +40,43 @@ const BlogList: React.FC<BlogListProps> = ({ blogs, isLoading = false }) => {
       );
     }
 
-    const now = new Date();
-    switch (dateFilter) {
-      case 'today':
-        filtered = filtered.filter(blog => {
-          const blogDate = new Date(blog.published_at);
-          return blogDate.toDateString() === now.toDateString();
-        });
-        break;
-      case 'week':
-        const weekAgo = new Date(now.setDate(now.getDate() - 7));
-        filtered = filtered.filter(blog => {
-          const blogDate = new Date(blog.published_at);
-          return blogDate >= weekAgo;
-        });
-        break;
-      case 'month':
-        const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
-        filtered = filtered.filter(blog => {
-          const blogDate = new Date(blog.published_at);
-          return blogDate >= monthAgo;
-        });
-        break;
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      const dateConstraints = {
+        today: subDays(now, 1),
+        week: subDays(now, 7),
+        month: subDays(now, 30)
+      };
+
+      filtered = filtered.filter(blog => {
+        const blogDate = new Date(blog.published_at);
+        return blogDate >= dateConstraints[dateFilter as keyof typeof dateConstraints];
+      });
+    }
+
+    if (showLikedOnly) {
+      const likedBlogIds = getLikedBlogs();
+      filtered = filtered.filter(blog => likedBlogIds.includes(blog.id));
     }
 
     return filtered;
-  }, [blogs, searchQuery, dateFilter]);
+  }, [blogs, searchQuery, dateFilter, showLikedOnly]);
 
   const totalPages = Math.ceil(filteredBlogs.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentBlogs = filteredBlogs.slice(startIndex, endIndex);
+  const currentBlogs = filteredBlogs.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
-  const handlePageChange = (pageNumber: number): void => {
+  const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-  };
-
-  const handleDateFilter = (value: string) => {
-    setDateFilter(value);
+  const clearFilters = () => {
+    setSearchQuery('');
+    setDateFilter('all');
+    setShowLikedOnly(false);
     setCurrentPage(1);
   };
 
@@ -86,16 +88,48 @@ const BlogList: React.FC<BlogListProps> = ({ blogs, isLoading = false }) => {
         <h1 className="text-3xl font-bold mb-8">Latest Blog Posts</h1>
       )}
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+      <div className="space-y-4 mb-8">
         {isLoading ? (
-          <>
-            <Skeleton className="h-10 w-full max-w-md" />
-            <Skeleton className="h-10 w-[180px]" />
-          </>
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <div className="flex gap-4">
+              <Skeleton className="h-10 w-[180px]" />
+              <Skeleton className="h-10 w-[120px]" />
+            </div>
+          </div>
         ) : (
           <>
-            <SearchBar onSearch={handleSearch} />
-            <DateFilter onFilterChange={handleDateFilter} />
+            <div className="flex flex-col md:flex-row gap-4">
+              <SearchBar
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+              <FilterBar
+                dateFilter={dateFilter}
+                showLikedOnly={showLikedOnly}
+                onDateFilterChange={(value) => {
+                  setDateFilter(value);
+                  setCurrentPage(1);
+                }}
+                onLikedFilterChange={() => {
+                  setShowLikedOnly(!showLikedOnly);
+                  setCurrentPage(1);
+                }}
+              />
+            </div>
+
+            <ActiveFilters
+              searchQuery={searchQuery}
+              dateFilter={dateFilter}
+              showLikedOnly={showLikedOnly}
+              onClearSearch={() => setSearchQuery('')}
+              onClearDateFilter={() => setDateFilter('all')}
+              onClearLikedFilter={() => setShowLikedOnly(false)}
+              onClearAll={clearFilters}
+            />
           </>
         )}
       </div>

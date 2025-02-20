@@ -1,36 +1,43 @@
 import BlogList from '@/components/Blog/BlogList';
 import { Suspense } from 'react';
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+import Loading from "./loading";
 
 async function getBlogs() {
   try {
-    // Add 5-second delay (optional)
-    await delay(5000);
-
-    const res = await fetch('http://localhost:3000/api/blogs', {
-      next: { revalidate: 60 }, // Ensure server-side caching behavior
+    const response = await fetch('https://dev.to/api/articles', {
+      headers: { 'Content-Type': 'application/json' },
+      next: { revalidate: 60 }, 
     });
 
-    if (!res.ok) {
-      throw new Error('Failed to fetch blogs');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch blogs: ${response.statusText}`);
     }
 
-    return res.json();
+    return response.json();
   } catch (error) {
     console.error('Error fetching blogs:', error);
-    return null; // Prevents crashing
+    throw error; 
   }
 }
 
-export default async function BlogPage() {
+// A separate component for handling suspense
+async function BlogListWrapper() {
   const blogs = await getBlogs();
 
   return (
+    <div className="container mx-auto px-4 py-8">
+      <BlogList blogs={blogs} isLoading={false} />
+    </div>
+  );
+}
+
+export default function BlogPage() {
+  return (
     <main className="min-h-screen bg-background">
-      <Suspense fallback={<BlogList blogs={[]} isLoading={true} />}>
-        {blogs ? <BlogList blogs={blogs} isLoading={false} /> : <p>Failed to load blogs.</p>}
+      <Suspense fallback={<Loading />}>
+        <BlogListWrapper />
       </Suspense>
     </main>
   );
 }
+

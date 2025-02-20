@@ -1,3 +1,7 @@
+export interface BlogDetailPageProps {
+  params: { id: string };
+}
+
 export interface Blog {
   type_of: string;
   id: string;

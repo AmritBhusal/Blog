@@ -1,11 +1,17 @@
+import { Suspense } from 'react';
 import BlogDetailClient from './BlogDetailClient';
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
-export async function getBlogDetail(id: string) {
+async function getBlogDetail(id: string) {
   try {
-    const response = await fetch(`http://localhost:3000/api/blogs/${id}`, {
-      next: { revalidate: 60 }, // Revalidate every 60 seconds
+    const response = await fetch(`https://dev.to/api/articles/${id}`, {
+      headers: { 'Content-Type': 'application/json' },
+      next: { revalidate: 60 },
     });
 
     if (!response.ok) {
@@ -15,27 +21,27 @@ export async function getBlogDetail(id: string) {
     return response.json();
   } catch (error) {
     console.error('Error fetching blog details:', error);
-    return null; // Prevents page crashes
+    throw error;
   }
 }
 
+export default async function BlogDetailPage({ params }: PageProps) {
+  try {
+    const { id } = await params; 
 
-interface BlogDetailPageProps {
-  params: {
-    id: string;
-  };
-}
+    if (!id) {
+      throw new Error('Blog ID is required');
+    }
 
-export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
-  if (!params?.id) {
-    return <p>Invalid blog ID</p>;
+    const blogData = await getBlogDetail(id);
+
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <BlogDetailClient blog={blogData} />
+      </Suspense>
+    );
+  } catch (error) {
+    console.error('Error in BlogDetailPage:', error);
+    return <div className="p-4 text-red-500">Failed to load blog details.</div>;
   }
-
-  const blogData = await getBlogDetail(params.id);
-
-  if (!blogData) {
-    return <p>Failed to load blog details.</p>;
-  }
-
-  return <BlogDetailClient blog={blogData} />;
 }

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import Link from 'next/link';
 
 export default function Navbar() {
   const { theme, setTheme } = useTheme();
@@ -12,7 +13,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <div className="flex items-center">
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="flex items-center justify-center rounded-lg bg-primary p-2 dark:bg-primary/10">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -33,13 +34,13 @@ export default function Navbar() {
             <span className="hidden text-xl font-bold text-gray-900 dark:text-white sm:inline-block">
               DevBlog
             </span>
-          </a>
+          </Link>
         </div>
 
         {/* Dark Mode Toggle */}
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="flex rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
           aria-label="Toggle theme"
         >
           <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
