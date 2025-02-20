@@ -1,6 +1,6 @@
 export interface Blog {
   type_of: string;
-  id: number;
+  id: string;
   title: string;
   description: string;
   readable_publish_date: string;
@@ -44,7 +44,7 @@ export interface Blog {
 
 export interface Blog_Detail {
   type_of: string;
-  id: number;
+  id: string;
   title: string;
   description: string;
   readable_publish_date: string;

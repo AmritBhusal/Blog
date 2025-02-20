@@ -1,39 +1,25 @@
 import { NextResponse } from 'next/server';
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const response = await fetch(`https://dev.to/api/articles/${params.id}`, {
-      signal: AbortSignal.timeout(5000)
+    const { id } = params;
+    if (!id) {
+      return NextResponse.json({ error: 'Blog ID is required' }, { status: 400 });
+    }
+
+    const response = await fetch(`https://dev.to/api/articles/${id}`, {
+      headers: { 'Content-Type': 'application/json' },
+      next: { revalidate: 60 }, // Revalidate every 60 seconds
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      return NextResponse.json({ error: `Failed to fetch blog: ${response.statusText}` }, { status: response.status });
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
-
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    if (error instanceof TypeError) {
-      return NextResponse.json(
-        { error: 'Network or parsing error occurred' },
-        { status: 503 }
-      );
-    }
-
-    if (error instanceof DOMException && error.name === 'AbortError') {
-      return NextResponse.json(
-        { error: 'Request timed out' },
-        { status: 408 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: 'Failed to fetch blog details' },
-      { status: 500 }
-    );
+    console.error('Error fetching blog details:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
