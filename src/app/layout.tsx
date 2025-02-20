@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Navbar from "@/components/Layout/Navbar";
+import { ThemeProvider } from 'next-themes'
+
 
 
 export const metadata: Metadata = {
@@ -13,9 +16,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en">     
       <body>
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Navbar />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
